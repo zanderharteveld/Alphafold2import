@@ -57,7 +57,7 @@ def make_dialog():
             type = 'cif'
         elif form.pdb.isChecked():
             type = 'pdb'
-        else: 
+        else:
             type = ''
         fetchAF2(code=code, name=name, type=type)
 
@@ -77,7 +77,7 @@ def _fetchAF2(code, name, state, finish, discrete, multiplex, zoom, type, path,
     discrete = bool: make discrete multi-state object
     multiplex = bool: split states into objects (like split_states)
     zoom = int: zoom to new loaded object
-    type = str: pdb, mmcif 
+    type = str: pdb, mmcif
     path = str: fetch_path
     file = str or file: file name or open file handle
     '''
@@ -98,7 +98,13 @@ def _fetchAF2(code, name, state, finish, discrete, multiplex, zoom, type, path,
     else:
         raise ValueError('type')
 
-    url = 'https://alphafold.ebi.ac.uk/files/AF-{code}-F1-model_v1.{type}'
+    if not code.startswith('AF-'):
+        code = 'AF-' + code
+    if not code[:-1].endswith('-F1-model_v'):
+        code = code + '-F1-model_v2'
+
+    #url = 'https://alphafold.ebi.ac.uk/files/AF-{code}-F1-model_v2.{type}'
+    url = 'https://alphafold.ebi.ac.uk/files/{code}.{type}'
 
     fobj = None
     contents = None
@@ -125,7 +131,7 @@ def _fetchAF2(code, name, state, finish, discrete, multiplex, zoom, type, path,
     except pymol.CmdException:
         if not quiet:
             colorprinting.warning(" Warning: failed to fetch from %s" % (url,))
-        
+
 
     if file:
         try:
@@ -205,7 +211,7 @@ fetch code [, name [, state [, finish [, discrete [, multiplex
 
 ARGUMENTS
 
-code = a single UniProt identifier or a list of identifiers. 
+code = a single UniProt identifier or a list of identifiers.
 
 name = the object name into which the file should be loaded.
 
@@ -221,7 +227,7 @@ PYMOL API
 cmd.fetchAF2(string code, string name, int state, init finish,
           int discrete, int multiplex, int zoom, string type,
           int async, string path, string file, int quiet)
-          
+
 NOTES
 
 When running in interactive mode, the fetch command loads
@@ -259,4 +265,3 @@ not work behind certain types of network firewalls.
         finally:
             _self.unblock_flush(_self)
     return r
-
